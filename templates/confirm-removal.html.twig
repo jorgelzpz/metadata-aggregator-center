@@ -1,0 +1,18 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <div class="container">
+
+    <h1>Borrado de subconjunto</h1>
+
+    <p>¿Confirma que desea borrar el subconjunto <tt>{{ set.name|e }}</tt>?</p>
+
+    <form method="post">
+      {{ form_widget(form) }}
+
+      <button type="submit" class="btn btn-default">Eliminar</button>
+    </form>
+
+    </div><!-- /.container -->
+
+{% endblock %}

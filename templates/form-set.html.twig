@@ -1,0 +1,32 @@
+{% extends "layout.html.twig" %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+
+{% block content %}
+    <div class="container">
+
+    <h1>Definición de subconjunto</h1>
+
+    <form method="post">
+      {{ form_widget(form) }}
+
+      <button type="submit" class="btn btn-default">Guardar</button>
+    </form>
+
+    <h3>Ejemplos de filtro</h3>
+    <ul>
+     <li>Selecciona todas las entidades de tipo IdP</li>
+     <p>
+     <code>md:EntityDescriptor[md:IDPSSODescriptor]</code>
+     </p>
+
+     <li>Selecciona todas las entidades de tipo IdP y entity-category
+     <em>http://www.geant.net/uri/dataprotection-code-of-conduct/v1</em>:</li>
+     <p>
+     <code>md:EntityDescriptor[md:IDPSSODescriptor and
+     md:Extensions/mdattr:EntityAttributes/saml:Attribute[@Name='http://macedir.org/entity-category']/saml:AttributeValue='http://www.geant.net/uri/dataprotection-code-of-conduct/v1']</code>
+     </p>
+    </ul>
+
+    </div><!-- /.container -->
+
+{% endblock %}

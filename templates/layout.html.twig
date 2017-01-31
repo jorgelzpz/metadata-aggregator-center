@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title '' %} - Metadata center</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ asset('css/main.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('css/bootstrap-theme.min.css') }}" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+	{% include 'navbar.html.twig' %}
+        {% block content %}{% endblock %}
+    </body>
+</html>

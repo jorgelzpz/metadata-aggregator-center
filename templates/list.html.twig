@@ -1,0 +1,34 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <div class="container">
+
+    <h1>Subconjuntos configurados</h1>
+
+    <table class="table table-striped">
+     <thead>
+      <tr>
+       <th>Nombre</th>
+       <th>URL</th>
+       <th>Filtro</th>
+       <th>Operaciones</th>
+      </tr>
+     </thead>
+     <tbody>
+      {% for set in sets %}
+      <tr>
+       <td>{{ set.name|e }}</td>
+       <td><tt>{{ set.url }}</tt></td>
+       <td><tt title="{{ set.filter|e('html_attr') }}">{{ set.filter|truncate(25) }}</tt></td>
+       <td>
+        <a class="btn btn-xs btn-default" href="{{ url('edit-set', {'name': set.name}) }}">Modificar</a>
+        <a class="btn btn-xs btn-danger" href="{{ url('remove-set', {'name': set.name}) }}">Borrar</a>
+       </td>
+      </tr>
+      {% endfor %}
+     </tbody>
+    </table>
+
+    </div><!-- /.container -->
+
+{% endblock %}
