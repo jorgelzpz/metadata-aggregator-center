@@ -1,0 +1,21 @@
+{
+    "name": "jorge/metarefresh-generator",
+    "description": "simpleSAMLphp metarefresh generator",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Jorge López Pérez",
+            "email": "jorge@jorgelp.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Jorge\\MetarefreshGenerator\\": "src/"
+        }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "~6.0",
+        "symfony/console": "^3.2",
+        "symfony/filesystem": "^3.2"
+    }
+}

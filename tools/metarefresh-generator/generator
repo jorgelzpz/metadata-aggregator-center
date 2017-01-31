@@ -1,0 +1,86 @@
+#!/usr/bin/env php
+<?php
+require __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use GuzzleHttp\Client;
+
+$app = new Application('Metarefresh Generator', '1.0.0');
+
+$app->register('generate')
+->addArgument('url', InputArgument::REQUIRED, 'Metadata center base URL')
+->addOption('output', null, InputOption::VALUE_REQUIRED, 'Output (default: stdout)')
+->setCode(function(InputInterface $input, OutputInterface $output) {
+    // TODO validate?
+    $url = $input->getArgument('url');
+
+    $cfg_output = $input->getOption('output');
+    if ($cfg_output !== null) {
+        if (file_exists($cfg_output) && !is_writable($cfg_output)) {
+            throw new \UnexpectedValueException('File ' . $cfg_output . ' is not writable');
+        }
+    }
+
+    $output->writeln('<info>Descargando desde ' . $url . '</info>');
+    $client = new Client([
+        'base_uri' => $url,
+    ]);
+
+    $sets_url = sprintf('%s/public/sets', $url);
+    $response = $client->get($sets_url);
+    $response_decoded = json_decode($response->getBody(), true);
+
+    if (!is_array($response_decoded) || !isset($response_decoded['sets'])) {
+        throw new \UnexpectedValueException(var_export($sets, true));
+    }
+
+    $result = [];
+
+    foreach ($response_decoded['sets'] as $set) {
+        $result[$set['name']] = [
+            'cron' => [ 'hourly' ],
+            'sources' => [
+                [
+                    'src' => sprintf('%s%s', $url, $set['url']),
+                    'template' => [
+                        'tags' => [ $set['name'] ],
+                    ],
+                    'types' => [ 'saml20-idp-remote' ],
+                ],
+            ],
+            'expireAfter' => 60*60*24*4,
+            'outputDir' => 'metadata/downloaded/' . $set['name'] .'/',
+            'outputFormat' => 'flatfile',
+        ];
+    }
+
+    $config = [ 'sets' => $result ];
+    $full_output = '<?php $config = ' . var_export($config, true) . ';';
+
+    $full_output .= <<<EOF
+
+if (file_exists(__DIR__ . '/config-metarefresh-extra.php')) {
+    require_once __DIR__ . '/config-metarefresh-extra.php';
+}
+EOF;
+
+    if ($cfg_output === null) {
+        $output->writeln($full_output);
+    } else {
+        $fs = new Filesystem();
+        $fs->dumpFile($cfg_output, $full_output);
+    }
+
+});
+$app->setDefaultCommand('generate', true);
+
+$app->run();
+
+
+# vim: ft=php

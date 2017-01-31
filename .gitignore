@@ -26,6 +26,7 @@
 !bin/console
 !bin/symfony_requirements
 /vendor/
+/tools/metarefresh-generator/vendor/
 
 # Assets and user uploads
 /web/bundles/
