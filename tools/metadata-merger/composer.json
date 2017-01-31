@@ -1,0 +1,21 @@
+{
+    "name": "jorge/metadata-merger",
+    "description": "simpleSAMLphp metadata merger",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Jorge López Pérez",
+            "email": "jorge@jorgelp.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Jorge\\MetadataMerger\\": "src/"
+        }
+    },
+    "require": {
+        "symfony/console": "^3.2",
+        "symfony/filesystem": "^3.2",
+        "symfony/finder": "^3.2"
+    }
+}

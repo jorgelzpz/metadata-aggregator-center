@@ -1,0 +1,66 @@
+#!/usr/bin/env php
+<?php
+require __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+
+$app = new Application('Metadata merger', '1.0.0');
+
+$app->register('merge')
+->addArgument('source', InputArgument::REQUIRED, 'Source directory')
+->addArgument('destination', InputArgument::REQUIRED, 'Destination file')
+->setCode(function(InputInterface $input, OutputInterface $output) {
+    $src = $input->getArgument('source');
+    $dest = $input->getArgument('destination');
+
+    if (!is_dir($src)) {
+        throw new \UnexpectedValueException('Source directory does not exist');
+    }
+
+    if (file_exists($dest) && !is_writable($dest)) {
+        throw new \UnexpectedValueException('Destination file is not writable');
+    }
+
+    $finder = new Finder();
+    $result = [];
+
+    foreach ($finder->files()->name('saml20-idp-remote.php')->in($src) as $metadata_file) {
+        $metadata = [];
+        require_once $metadata_file->getRealPath();
+
+        foreach ($metadata as $entity_id => $params) {
+            if (!isset($result[$entity_id])) {
+                $result[$entity_id] = $params;
+                continue;
+            }
+
+            $orig_tags = $result[$entity_id]['tags'] ?? [];
+            $new_tags = $metadata[$entity_id]['tags'] ?? [];
+
+            $result[$entity_id]['tags'] = array_merge($orig_tags, $new_tags);
+        }
+    }
+
+    $new_metadata = "<?php\n";
+
+    foreach ($result as $entity_id => $params) {
+        $new_metadata .= '$metadata[\''.addslashes($entity_id).'\'] = ' . var_export($params, true) . ";\n";
+    }
+
+    $fs = new Filesystem();
+    $fs->dumpFile($dest, $new_metadata);
+
+
+});
+$app->setDefaultCommand('merge', true);
+
+$app->run();
+
+
+# vim: ft=php
