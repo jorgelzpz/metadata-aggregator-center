@@ -1,3 +1,5 @@
+This tool generates a suitable config file for the SimpleSAMLphp's metarefresh module.
+
 Calling the generator:
 
     generator [--output OUTPUT] [--] <url>
